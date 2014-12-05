@@ -29,6 +29,9 @@
 	"dependencies": {
 		"toolset": 				"latest",
 		"underscore": 			"latest",
+		"passport":		"latest",
+		"passport-github":		"latest",
+		"passport-youtube-v3":		"latest",
 		"passport-google":		"latest",
 		"passport-twitter":		"latest",
 		"passport-facebook":	"latest",
