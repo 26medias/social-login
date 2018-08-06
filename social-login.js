@@ -4,8 +4,7 @@ var YoutubeStrategy 	= require('passport-youtube-v3').Strategy;
 var FacebookStrategy 	= require('passport-facebook').Strategy;
 var TwitterStrategy 	= require('passport-twitter').Strategy;
 // var GoogleStrategy 		= require('passport-google').Strategy;
-var GoogleStrategy 		= 
-require('passport-google-oauth20').Strategy;
+var GoogleStrategy 		= require('passport-google-oauth20').Strategy;
 var GitHubStrategy 		= require('passport-github').Strategy;
 var LinkedInStrategy 	= require('passport-linkedin').Strategy;
 var InstagramStrategy 	= require('passport-instagram').Strategy;
@@ -29,22 +28,17 @@ var socialLoginClass = function(options) {
 	this.returnRaw 	= options.returnRaw || false;
 	this.app 		= options.app 		|| {};
 	this.onAuth 	= options.onAuth 	|| function() {};
-	this.url		= options.url		|| 
-'http://127.0.0.1';
-	this.logout		= options.logout	|| {url: 
-'/logout', after:	'/'};
+	this.url		= options.url		|| 'http://127.0.0.1';
+	this.logout		= options.logout	|| {url: '/logout', after:	'/'};
 	
 	
 	// Special Cases
-	// PassportJS doesn't have a standardized API, with its property 
-names changing from Strategy to Strategy.
-	// Here we fix that, taking social-login's standardized API and 
-turning it into what Passportjs expects.
+	// PassportJS doesn't have a standardized API, with its property names changing from Strategy to Strategy.
+	// Here we fix that, taking social-login's standardized API and turning it into what Passportjs expects.
 	this.specialCases = {
 		twitter:	{
 			setup:	{
-				userAuthorizationURL: 	
-"https://api.twitter.com/oauth/authorize",
+				userAuthorizationURL: 	"https://api.twitter.com/oauth/authorize",
 			},
 			varChanges:	{
 				clientID:		'consumerKey',
@@ -63,10 +57,8 @@ turning it into what Passportjs expects.
 			// 	clientSecret:	'consumerSecret'
 			// },
 			// varAdd:	{
-			// 	returnURL:	function(settings) 
-{return scope.url+settings.url.callback;},
-			// 	realm:		function(settings) 
-{return scope.url+'/';},
+			// 	returnURL:	function(settings) {return scope.url+settings.url.callback;},
+			// 	realm:		function(settings) {return scope.url+'/';},
 			// }
 		},
 		meetup:	{
@@ -117,8 +109,7 @@ turning it into what Passportjs expects.
 	};
 	
 	// The strategy names
-	// Some passport libs have more complex internal names than just 
-the name of the service.
+	// Some passport libs have more complex internal names than just the name of the service.
 	this.strategyNameMap = {
 		dropbox:	'dropbox-oauth2'
 	};
@@ -194,33 +185,27 @@ socialLoginClass.prototype.setup = function(type, settings) {
 	//toolset.log("Setting up:", type);
 	var scope = this;
 	if (!this.map[type]) {
-		toolset.error("Error!",'type "'+type+'" is not 
-supported.');
+		toolset.error("Error!",'type "'+type+'" is not supported.');
 		return false;
 	}
 	
 	// Passport setup
 	var passportSetup = {
-		clientID: 			
-settings.settings.clientID,
+		clientID: 			settings.settings.clientID,
 		clientSecret: 		settings.settings.clientSecret,
 		callbackURL: 		this.url+settings.url.callback,
 		passReqToCallback: 	true
 	};
-	// Update the variable names if needed, because Passport is 
-unable to standardize things apparently.
-	if (this.specialCases[type] && 
-this.specialCases[type].varChanges) {
+	// Update the variable names if needed, because Passport is unable to standardize things apparently.
+	if (this.specialCases[type] && this.specialCases[type].varChanges) {
 		var varname;
 		for (varname in this.specialCases[type].varChanges) {
 			(function(varname) {
 				// Save a copy
-				var buffer 	= 
-passportSetup[varname];
+				var buffer 	= passportSetup[varname];
 				
 				// Create the new property
-				
-passportSetup[scope.specialCases[type].varChanges[varname]] = buffer;
+				passportSetup[scope.specialCases[type].varChanges[varname]] = buffer;
 				
 				/// Remove the original data
 				delete passportSetup[varname];
@@ -233,27 +218,21 @@ passportSetup[scope.specialCases[type].varChanges[varname]] = buffer;
 		var varname;
 		for (varname in this.specialCases[type].varAdd) {
 			(function(varname) {
-				passportSetup[varname] = 
-scope.specialCases[type].varAdd[varname](settings);
+				passportSetup[varname] = scope.specialCases[type].varAdd[varname](settings);
 			})(varname);
 		}
 	}
 	// Extend the settings if needed
 	if (this.specialCases[type] && this.specialCases[type].setup) {
-		passportSetup = _.extend(passportSetup, 
-this.specialCases[type].setup);
+		passportSetup = _.extend(passportSetup, this.specialCases[type].setup);
 	}
 	
 	//toolset.log("passportSetup", passportSetup);
 	
 	// Execute the passport strategy
-	//passport.use(new (this.map[type])(passportSetup, 
-settings.methods.auth));
-	passport.use(new (this.map[type])(passportSetup, function (req, 
-accessToken, refreshToken, profile, done) {
-		scope.onAuth(req, type, scope.uniqueIds[type], 
-accessToken, refreshToken, 
-scope.returnRaw?profile:scope.preparseProfileData(type, profile), done);
+	//passport.use(new (this.map[type])(passportSetup, settings.methods.auth));
+	passport.use(new (this.map[type])(passportSetup, function (req, accessToken, refreshToken, profile, done) {
+		scope.onAuth(req, type, scope.uniqueIds[type], accessToken, refreshToken, scope.returnRaw?profile:scope.preparseProfileData(type, profile), done);
 	}));
 	
 	var strategyName = type;
@@ -262,25 +241,20 @@ scope.returnRaw?profile:scope.preparseProfileData(type, profile), done);
 	}
 	
 	// Setup the enty point (/auth/:service)
-	this.app.get(settings.url.auth, 
-passport.authenticate(strategyName, settings.settings.authParameters || 
-{}));
+	this.app.get(settings.url.auth, passport.authenticate(strategyName, settings.settings.authParameters || {}));
 	
 	// Setup the callback url (/auth/:service/callback)
 	//toolset.log("strategyName", strategyName);
-	this.app.get(settings.url.callback, 
-passport.authenticate(strategyName, {
+	this.app.get(settings.url.callback, passport.authenticate(strategyName, {
 		successRedirect: 	settings.url.success,
 		failureRedirect: 	settings.url.fail,
 		failureFlash: 		true
 	}));
 }
 
-// The response is not uniform, making it harder to manage consistent 
-data format accross all the services.
+// The response is not uniform, making it harder to manage consistent data format accross all the services.
 // 
-socialLoginClass.prototype.preparseProfileData = function(type, profile) 
-{
+socialLoginClass.prototype.preparseProfileData = function(type, profile) {
 	
 	//toolset.log("Profile", profile);
 	
