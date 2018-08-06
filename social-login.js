@@ -3,7 +3,8 @@ var passport 			= require('passport');
 var YoutubeStrategy 	= require('passport-youtube-v3').Strategy;
 var FacebookStrategy 	= require('passport-facebook').Strategy;
 var TwitterStrategy 	= require('passport-twitter').Strategy;
-var GoogleStrategy 		= require('passport-google').Strategy;
+// var GoogleStrategy 		= require('passport-google').Strategy;
+var GoogleStrategy 		= require('passport-google-oauth20').Strategy;
 var GitHubStrategy 		= require('passport-github').Strategy;
 var LinkedInStrategy 	= require('passport-linkedin').Strategy;
 var InstagramStrategy 	= require('passport-instagram').Strategy;
@@ -51,10 +52,14 @@ var socialLoginClass = function(options) {
 			}
 		},
 		google:	{
-			varAdd:	{
-				returnURL:	function(settings) {return scope.url+settings.url.callback;},
-				realm:		function(settings) {return scope.url+'/';},
-			}
+			// varChanges:	{
+			// 	clientID:		'consumerKey',
+			// 	clientSecret:	'consumerSecret'
+			// },
+			// varAdd:	{
+			// 	returnURL:	function(settings) {return scope.url+settings.url.callback;},
+			// 	realm:		function(settings) {return scope.url+'/';},
+			// }
 		},
 		meetup:	{
 			varChanges:	{
@@ -136,6 +141,45 @@ socialLoginClass.prototype.init = function() {
 	for (type in this.settings) {
 		this.setup(type, this.settings[type]);
 	}
+	
+	
+	// Setup the cache
+	var caching = function(ttl) {
+		this.ttl 	= ttl;
+		this.cache 	= {};
+		var scope = this;
+		setInterval(function() {
+			var i;
+			var t = new Date().getTime();
+			for (i in scope.cache) {
+				if (scope.cache[i].expires < t) {
+					delete scope.cache[i];
+				}
+			}
+		}, this.ttl/2);
+	};
+	caching.prototype.set = function(label, value) {
+		//Gamify.log("set()", [label, value]);
+		var expires = new Date().getTime()+this.ttl;
+		this.cache[label] = {
+			data:		value,
+			expires:	expires
+		}
+		return expires;
+	}
+	caching.prototype.get = function(label) {
+		if (this.cache[label]) {
+			return this.cache[label].data;
+		}
+		return null;
+	};
+	caching.prototype.clear = function(label) {
+		//Gamify.log("clear",label);
+		delete this.cache[label];
+	};
+	
+	this.cache = new caching(1000*20);	// 20sec session caching
+	
 }
 socialLoginClass.prototype.setup = function(type, settings) {
 	//toolset.log("Setting up:", type);
@@ -183,7 +227,7 @@ socialLoginClass.prototype.setup = function(type, settings) {
 		passportSetup = _.extend(passportSetup, this.specialCases[type].setup);
 	}
 	
-	toolset.log("passportSetup", passportSetup);
+	//toolset.log("passportSetup", passportSetup);
 	
 	// Execute the passport strategy
 	//passport.use(new (this.map[type])(passportSetup, settings.methods.auth));
@@ -200,7 +244,7 @@ socialLoginClass.prototype.setup = function(type, settings) {
 	this.app.get(settings.url.auth, passport.authenticate(strategyName, settings.settings.authParameters || {}));
 	
 	// Setup the callback url (/auth/:service/callback)
-	toolset.log("strategyName", strategyName);
+	//toolset.log("strategyName", strategyName);
 	this.app.get(settings.url.callback, passport.authenticate(strategyName, {
 		successRedirect: 	settings.url.success,
 		failureRedirect: 	settings.url.fail,
@@ -212,7 +256,7 @@ socialLoginClass.prototype.setup = function(type, settings) {
 // 
 socialLoginClass.prototype.preparseProfileData = function(type, profile) {
 	
-	toolset.log("Profile", profile);
+	//toolset.log("Profile", profile);
 	
 	
 	var data = profile._json;

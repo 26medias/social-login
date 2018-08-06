@@ -124,7 +124,13 @@ socialLogin.use({
 		}
 	},
 	google:	{
-		settings:	{}, // Google doesn't take any API key or API secret
+		settings:	{
+		        clientID: 		"YOUR_API_KEY",
+			clientSecret: 	"YOUR_API_SECRET",
+			authParameters:	{
+				scope: 'profile'
+			}
+		}, // Google doesn't take any API key or API secret
 		url:	{
 			auth:		"/auth/google",
 			callback: 	"/auth/google/callback",
