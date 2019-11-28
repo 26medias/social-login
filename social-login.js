@@ -3,10 +3,9 @@ var passport 			= require('passport');
 var YoutubeStrategy 	= require('passport-youtube-v3').Strategy;
 var FacebookStrategy 	= require('passport-facebook').Strategy;
 var TwitterStrategy 	= require('passport-twitter').Strategy;
-// var GoogleStrategy 		= require('passport-google').Strategy;
 var GoogleStrategy 		= require('passport-google-oauth20').Strategy;
 var GitHubStrategy 		= require('passport-github').Strategy;
-var LinkedInStrategy 	= require('passport-linkedin').Strategy;
+var LinkedInStrategy 	= require('passport-linkedin-oauth2').Strategy;
 var InstagramStrategy 	= require('passport-instagram').Strategy;
 var AmazonStrategy 		= require('passport-amazon').Strategy;
 var dropBoxStrategy 	= require('passport-dropbox-oauth2').Strategy;
@@ -41,12 +40,6 @@ var socialLoginClass = function(options) {
 			setup:	{
 				userAuthorizationURL: 	"https://api.twitter.com/oauth/authorize",
 			},
-			varChanges:	{
-				clientID:		'consumerKey',
-				clientSecret:	'consumerSecret'
-			}
-		},
-		linkedin:	{
 			varChanges:	{
 				clientID:		'consumerKey',
 				clientSecret:	'consumerSecret'
