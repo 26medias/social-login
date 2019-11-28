@@ -3,18 +3,18 @@ var passport 			= require('passport');
 var YoutubeStrategy 	= require('passport-youtube-v3').Strategy;
 var FacebookStrategy 	= require('passport-facebook').Strategy;
 var TwitterStrategy 	= require('passport-twitter').Strategy;
-// var GoogleStrategy 		= require('passport-google').Strategy;
 var GoogleStrategy 		= require('passport-google-oauth20').Strategy;
 var GitHubStrategy 		= require('passport-github').Strategy;
-var LinkedInStrategy 	= require('passport-linkedin').Strategy;
+var LinkedInStrategy 	= require('passport-linkedin-oauth2').Strategy;
 var InstagramStrategy 	= require('passport-instagram').Strategy;
 var AmazonStrategy 		= require('passport-amazon').Strategy;
 var dropBoxStrategy 	= require('passport-dropbox-oauth2').Strategy;
 var FoursquareStrategy 	= require('passport-foursquare').Strategy;
 var ImgurStrategy 		= require('passport-imgur').Strategy;
-var MeetupStrategy 		= require('passport-meetup').Strategy;
+var MeetupStrategy 		= require('passport-oauth2-meetup').Strategy;
 var WordpressStrategy 	= require('passport-wordpress').Strategy;
 var TumblrStrategy 		= require('passport-tumblr').Strategy;
+var SnapchatStrategy  = require('passport-snapchat').Strategy;
 
 /* Misc */
 var toolset 	= require('toolset');
@@ -45,32 +45,20 @@ var socialLoginClass = function(options) {
 				clientSecret:	'consumerSecret'
 			}
 		},
-		linkedin:	{
-			varChanges:	{
-				clientID:		'consumerKey',
-				clientSecret:	'consumerSecret'
-			}
-		},
-		google:	{
-			// varChanges:	{
-			// 	clientID:		'consumerKey',
-			// 	clientSecret:	'consumerSecret'
-			// },
-			// varAdd:	{
-			// 	returnURL:	function(settings) {return scope.url+settings.url.callback;},
-			// 	realm:		function(settings) {return scope.url+'/';},
-			// }
-		},
-		meetup:	{
-			varChanges:	{
-				clientID:		'consumerKey',
-				clientSecret:	'consumerSecret'
-			}
-		},
 		tumblr:	{
 			varChanges:	{
 				clientID:		'consumerKey',
 				clientSecret:	'consumerSecret'
+			}
+		},
+		snapchat: {
+			varAdd: {
+				profileFields: function (settings) {
+					return settings.settings.profileFields;
+				},
+				scope: function (settings) {
+					return settings.settings.scope;
+				},
 			}
 		}
 	};
@@ -89,7 +77,8 @@ var socialLoginClass = function(options) {
 		imgur:			ImgurStrategy,
 		meetup:			MeetupStrategy,
 		wordpress:		WordpressStrategy,
-		tumblr:			TumblrStrategy
+		tumblr:			TumblrStrategy,
+		snapchat:   SnapchatStrategy
 	};
 	
 	this.uniqueIds = {
@@ -105,7 +94,8 @@ var socialLoginClass = function(options) {
 		imgur:			'id',
 		meetup:			'id',
 		wordpress:		'ID',
-		tumblr:			'name'
+		tumblr:			'name',
+		snapchat:   'id'
 	};
 	
 	// The strategy names
