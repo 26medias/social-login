@@ -15,6 +15,7 @@ var ImgurStrategy 		= require('passport-imgur').Strategy;
 var MeetupStrategy 		= require('passport-oauth2-meetup').Strategy;
 var WordpressStrategy 	= require('passport-wordpress').Strategy;
 var TumblrStrategy 		= require('passport-tumblr').Strategy;
+var SnapchatStrategy  = require('passport-snapchat').Strategy;
 
 /* Misc */
 var toolset 	= require('toolset');
@@ -56,6 +57,16 @@ var socialLoginClass = function(options) {
 				clientID:		'consumerKey',
 				clientSecret:	'consumerSecret'
 			}
+		},
+		snapchat: {
+			varAdd: {
+				profileFields: function (settings) {
+					return settings.settings.profileFields;
+				},
+				scope: function (settings) {
+					return settings.settings.scope;
+				},
+			}
 		}
 	};
 	
@@ -73,7 +84,8 @@ var socialLoginClass = function(options) {
 		imgur:			ImgurStrategy,
 		meetup:			MeetupStrategy,
 		wordpress:		WordpressStrategy,
-		tumblr:			TumblrStrategy
+		tumblr:			TumblrStrategy,
+		snapchat:   SnapchatStrategy
 	};
 	
 	this.uniqueIds = {
@@ -89,7 +101,8 @@ var socialLoginClass = function(options) {
 		imgur:			'id',
 		meetup:			'id',
 		wordpress:		'ID',
-		tumblr:			'name'
+		tumblr:			'name',
+		snapchat:   'id'
 	};
 	
 	// The strategy names
