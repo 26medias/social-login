@@ -12,7 +12,7 @@ var AmazonStrategy 		= require('passport-amazon').Strategy;
 var dropBoxStrategy 	= require('passport-dropbox-oauth2').Strategy;
 var FoursquareStrategy 	= require('passport-foursquare').Strategy;
 var ImgurStrategy 		= require('passport-imgur').Strategy;
-var MeetupStrategy 		= require('passport-meetup').Strategy;
+var MeetupStrategy 		= require('passport-oauth2-meetup').Strategy;
 var WordpressStrategy 	= require('passport-wordpress').Strategy;
 var TumblrStrategy 		= require('passport-tumblr').Strategy;
 
@@ -46,22 +46,6 @@ var socialLoginClass = function(options) {
 			}
 		},
 		linkedin:	{
-			varChanges:	{
-				clientID:		'consumerKey',
-				clientSecret:	'consumerSecret'
-			}
-		},
-		google:	{
-			// varChanges:	{
-			// 	clientID:		'consumerKey',
-			// 	clientSecret:	'consumerSecret'
-			// },
-			// varAdd:	{
-			// 	returnURL:	function(settings) {return scope.url+settings.url.callback;},
-			// 	realm:		function(settings) {return scope.url+'/';},
-			// }
-		},
-		meetup:	{
 			varChanges:	{
 				clientID:		'consumerKey',
 				clientSecret:	'consumerSecret'
